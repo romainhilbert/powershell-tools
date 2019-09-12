@@ -1,4 +1,3 @@
-
 <#PSScriptInfo
 .LASTCHANGED 2019/09/12
 
@@ -88,7 +87,7 @@ Function Get-SystemInfo {
 	$Object | Add-Member -Type NoteProperty -Name "Up Time" -Value $uptime					
                         
     # Checking network adapters and their IP address
-    $NetAdapters = Get-WmiObject Win32_NetworkAdapterConfiguration -ComputerName $Server -Namespace "root\CIMV2" | where{$_.IPEnabled -eq “True”}
+    $NetAdapters = Get-WmiObject Win32_NetworkAdapterConfiguration -Namespace "root\CIMV2" | where{$_.IPEnabled -eq "True"}
     
     ForEach($Item in $NetAdapters) {
 		$NetAdapName = $Item.Description
