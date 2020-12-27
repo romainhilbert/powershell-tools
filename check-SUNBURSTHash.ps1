@@ -70,8 +70,8 @@ $IOC_MD5_List = @(
 "[+] Description     : Searching files by MD5 hash"
 Start-Sleep -s 1
 
-[string]$OutLogfile   = "HashLog{.TIMESTAMP}.csv",
-[string]$MatchLogfile = "MatchLog{.TIMESTAMP}.txt",
+[string]$OutLogfile   = "HashLog{.TIMESTAMP}.csv"
+[string]$MatchLogfile = "MatchLog{.TIMESTAMP}.txt"
 
 $timestamp = Get-Date -format s
 $timestamp = $timestamp.Replace(':','').Replace('-','')
