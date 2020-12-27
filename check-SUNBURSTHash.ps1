@@ -23,6 +23,11 @@
   powershell -ep bypass -f check-SUNBURSTHash.ps1  -SearchPath  "C:\temp"  -SearchFilter "*.exe"
   powershell -ep bypass -f check-SUNBURSTHash.ps1  -SearchPath  "C:\temp"  -SearchFilter "*.exe"  -Hash "9bb6826905965c13be1c84cc0ff83f42"	
 
+  $url = 'https://raw.githubusercontent.com/romainhilbert/powershell-tools/master/check-SUNBURSTHash.ps1'
+  IEX (New-Object Net.WebClient).DownloadString($url)
+ 
+
+
 .NOTES
   https://us-cert.cisa.gov/ncas/alerts/aa20-352a
   https://cyber.dhs.gov/ed/21-01/
