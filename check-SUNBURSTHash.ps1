@@ -1,12 +1,14 @@
 <#
 .DESCRIPTION
-  Searching filess by MD5 hash
+  Searching files by MD5 hash
   Create MD5 hash list from files selected by SearchPath and SearchFilter 
   and compare to MD5 hashes from a given IOC (Indicators of Compromise) list
 
 .PARAMETER 	$SearchPath  
 
 .PARAMETER 	$SearchFilter 
+
+.PARAMETER 	$Hash
 
 .NOTES
   Version:        1.0
@@ -39,8 +41,6 @@
 #>
 
 param (
-	[string]$OutLogfile   = "HashLog{.TIMESTAMP}.csv",
-	[string]$MatchLogfile = "MatchLog{.TIMESTAMP}.txt",
 	[string]$SearchPath   = "C:\Program Files (x86)",
 	[string]$SearchFilter = "*.dll",
 	[string]$Hash         = $null
@@ -61,17 +61,6 @@ $IOC_MD5_List = @(
 	'B633BCC4C34FEB41CE5657F28146F268'
 )
 
-Function SearchBy-MD5Hash {
-	param (
-		[string]$OutLogfile   = "HashLog{.TIMESTAMP}.csv",
-		[string]$MatchLogfile = "MatchLog{.TIMESTAMP}.txt",
-		[string]$SearchPath   = "C:\Program Files (x86)",
-		[string]$SearchFilter = "*.dll"
-)
-
-	"### NONE"
-
-}
 
 ### MAIN ##########################################################################
 
@@ -81,6 +70,8 @@ Function SearchBy-MD5Hash {
 "[+] Description     : Searching files by MD5 hash"
 Start-Sleep -s 1
 
+[string]$OutLogfile   = "HashLog{.TIMESTAMP}.csv",
+[string]$MatchLogfile = "MatchLog{.TIMESTAMP}.txt",
 
 $timestamp = Get-Date -format s
 $timestamp = $timestamp.Replace(':','').Replace('-','')
