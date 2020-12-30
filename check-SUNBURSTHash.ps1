@@ -1,19 +1,19 @@
 <#
 .DESCRIPTION
-  Searching files by MD5 hash
-  Create MD5 hash list from files selected by SearchPath and SearchFilter 
-  and compare to MD5 hashes from a given IOC (Indicators of Compromise) list
+  Searching files by MD5 or SHA1 hash
+  Create MD5,SHA1,... hash list from files selected by SearchPath and SearchFilter 
+  and compare to hashes from a given IOC (Indicators of Compromise) list
 
 .PARAMETER 	$SearchPath  
 
 .PARAMETER 	$SearchFilter 
 
-.PARAMETER 	$Hash
+.PARAMETER 	$HashValue
 
 .NOTES
   Version:        1.0
-  Author:         HIRO
-  Creation Date:  2020-12-25
+  Author:         Romain
+  Creation Date:  2020-12-30
 
 .EXAMPLE
   powershell -ep bypass -f check-SUNBURSTHash.ps1  
@@ -21,12 +21,8 @@
   powershell -ep bypass -f check-SUNBURSTHash.ps1  -SearchPath  "C:\Program Files"
   powershell -ep bypass -f check-SUNBURSTHash.ps1  -SearchPath  "C:\Program Files (x86)"
   powershell -ep bypass -f check-SUNBURSTHash.ps1  -SearchPath  "C:\temp"  -SearchFilter "*.exe"
-  powershell -ep bypass -f check-SUNBURSTHash.ps1  -SearchPath  "C:\temp"  -SearchFilter "*.exe"  -Hash "9bb6826905965c13be1c84cc0ff83f42"	
-
-  $url = 'https://raw.githubusercontent.com/romainhilbert/powershell-tools/master/check-SUNBURSTHash.ps1'
-  IEX (New-Object Net.WebClient).DownloadString($url)
- 
-
+  powershell -ep bypass -f check-SUNBURSTHash.ps1  -SearchPath  "C:\temp"  -SearchFilter "*.exe"  -Hash "9bb6826905965c13be1c84cc0ff83f42"
+  powershell "IEX (New-Object Net.WebClient).DownloadString('https://s3.amazonaws.com/powershell.seclab.cx/check-SUNBURSTHash.ps1')"
 
 .NOTES
   https://us-cert.cisa.gov/ncas/alerts/aa20-352a
@@ -43,12 +39,17 @@
 .TODO
   Write function to run script by download craddle
 
+  Only 1 file !!!!!!
+
+  
+
 #>
 
 param (
 	[string]$SearchPath   = "C:\Program Files (x86)",
 	[string]$SearchFilter = "*.dll",
-	[string]$Hash         = $null
+	[string]$Algorithm    = "MD5",
+	[string]$HashValue    = $null
 )
 
 $IOC_MD5_List = @(
@@ -58,6 +59,7 @@ $IOC_MD5_List = @(
 	'd5aad0d248c237360cf39c054b654d69',
 	'2c4a910a1299cdae2a4e55988a2f102e',
 	'846e27a652a5e1bfbd0ddd38a16dc865',
+	'72c887ead9a9d4ee114815748da3da35'
 	'baa3d3488db90289eb2889c1a2acbcde',
 	'e18a6a21eb44e77ca8d739a72209c370',
 	'3e329a4c9030b26ba152fb602a1d5893',
@@ -66,17 +68,26 @@ $IOC_MD5_List = @(
 	'B633BCC4C34FEB41CE5657F28146F268'
 )
 
+Function SearchBy-Hash {
+	param (
+		[string]$OutLogfile   = "HashLog{.TIMESTAMP}.csv",
+		[string]$SearchPath   = "C:\Program Files (x86)",
+		[string]$SearchFilter = "*.dll"
+)
+
+	"### NONE"
+
+}
 
 ### MAIN ##########################################################################
 
 '-'*79
 
-"[+] Date            : $(Get-Date -format s)"
-"[+] Description     : Searching files by MD5 hash"
+"[+] Date                : $(Get-Date -format s)"
+"[+] Description         : Searching files by cryptographic hash value"
 Start-Sleep -s 1
 
-[string]$OutLogfile   = "HashLog{.TIMESTAMP}.csv"
-[string]$MatchLogfile = "MatchLog{.TIMESTAMP}.txt"
+[string]$OutLogfile   = "HashSearchLog-{.TIMESTAMP}.csv"
 
 $timestamp = Get-Date -format s
 $timestamp = $timestamp.Replace(':','').Replace('-','')
@@ -85,65 +96,62 @@ $timestamp = $timestamp.Replace(':','').Replace('-','')
 ## All MD5 and path and filenames from SearchPath and SearchFilter enumeration are written to $OutLogfile
 $OutLogfile   = $OutLogfile.Replace('{.TIMESTAMP}', $timestamp)
 
-## Filenames which match the MD5s from IOC List are written to $MatchLogfile
-$MatchLogfile = $MatchLogfile.Replace('{.TIMESTAMP}', $timestamp)
-
-
 ## Check if Last character is backslash '\'  or use $SearchPath[-1]
 ##If (!($SearchPath.EndsWith('\'))) {
 ##	$SearchPath += "\" 
 ##}
 
 
+# Check if HASH was provided via commandline; otherwise use hashes provided by local IOC variable list
+If (! [string]::IsNullOrEmpty( $HashValue )) {
+	$IOC_MD5_List  = @( $HashValue )
+	""
+	"[+] Search Hash         : $HashValue"
+}
+
+
 ""
-"[+] Status          : Enumerating Files by '-Filter' and '-Path' ..."
-"[+] Path            : $SearchPath"
-"[+] Filter          : $SearchFilter"
+"[+] Status              : Enumerating Files by '-Path' and '-Filter'  ..."
+"[+] Path                : $SearchPath"
+"[+] Filter              : $SearchFilter"
 Start-Sleep -s 1
 
 # Enumerating Files by '-Filter' and '-Path' parameter and export to CSV file
-Get-ChildItem -Path $SearchPath -Filter $SearchFilter -Recurse -Force -ErrorAction SilentlyContinue | Get-FileHash -ErrorAction SilentlyContinue -Algorithm MD5 | Export-Csv -Append -Delimiter ";" -NoTypeInformation -Path  $OutLogfile  
+#Get-ChildItem -Path $SearchPath -Filter $SearchFilter -Recurse -Force -ErrorAction SilentlyContinue | Get-FileHash -ErrorAction SilentlyContinue -Algorithm $Algorithm | Export-Csv -Append -Delimiter ";" -NoTypeInformation -Path  $OutLogfile  
 
-                                                                     
-""
-"[+] MD5 CSV Logfile  : $OutLogfile"
-Start-Sleep -s 1
 
-""
-"[+] Status          : Comparing to Hash in list ..."
+$itemList = Get-ChildItem -Path $SearchPath -Filter $SearchFilter -Recurse -Force -ErrorAction SilentlyContinue 
 
-Start-Sleep -s 1
-
-"[+] Date             : $(Get-Date -format s)"   | Out-File $MatchLogfile 
-"[+] Path             : $SearchPath"             | Out-File $MatchLogfile -append
-"[+] Filter           : $SearchFilter"           | Out-File $MatchLogfile -append
-""                                             | Out-File $MatchLogfile -append
-"Hash                             Path"        | Out-File $MatchLogfile -append                              
-"----                             ----"        | Out-File $MatchLogfile -append
-
-$hashList = Import-Csv -Path  $OutLogfile -Delimiter ";" 
-
-# Check if MD5 was provided via commandline; otherwise use M5 provided by local variable list
-If (! [string]::IsNullOrEmpty( $Hash )) {
-	$IOC_MD5_List  = @( $Hash )
-	"[+] Search MD5 Hash : $Hash"
-}
 
 ""
+"[+] Number of files     : $($itemList.Length)"
 
-$hashList  | % {
-	$checkItem  = $_
+
+$results = @()
+
+$itemList | % {
+	$hash = Get-FileHash $_.FullName -ErrorAction SilentlyContinue -Algorithm $Algorithm  
+	$hash | Add-Member -NotePropertyName "MatchIOC" -NotePropertyValue "0"
 
 	$IOC_MD5_List | % {
-		If ($_ -eq $checkItem.Hash) {
-			Write-Host "[+] MATCH : Hash=$($checkItem.Hash); Path=$($checkItem.Path)"  -ForegroundColor Red -BackgroundColor Yellow
-			"$($checkItem.Hash) $($checkItem.Path)" | Out-File $MatchLogfile -append 
-		}
+		If ($hash.Hash -eq $_) {
+			$hash.MatchIOC = "1"
+		} 
 	}
+
+	$results += $hash
 }
 
+
 ""
-"[+] MD5 Match file  : $MatchLogfile"
+$results |  where MatchIOC -eq 1 | ft -autosize
+
+
+""                                                                     
+"[+] Hash Search Logfile : $OutLogfile"
+$results | Export-Csv -Append -Delimiter ";" -NoTypeInformation -Path  $OutLogfile
+
 
 ""
 "[+] DONE !"
+
