@@ -22,7 +22,7 @@
   powershell -ep bypass -f check-SUNBURSTHash.ps1  -SearchPath  "C:\Program Files (x86)"
   powershell -ep bypass -f check-SUNBURSTHash.ps1  -SearchPath  "C:\temp"  -SearchFilter "*.exe"
   powershell -ep bypass -f check-SUNBURSTHash.ps1  -SearchPath  "C:\temp"  -SearchFilter "*.exe"  -Hash "9bb6826905965c13be1c84cc0ff83f42"
-  powershell "IEX (New-Object Net.WebClient).DownloadString('https://s3.amazonaws.com/powershell.seclab.cx/check-SUNBURSTHash.ps1')"
+  powershell "IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/romainhilbert/powershell-tools/master/check-SUNBURSTHash.ps1')"
 
 .NOTES
   https://us-cert.cisa.gov/ncas/alerts/aa20-352a
@@ -59,7 +59,6 @@ $IOC_MD5_List = @(
 	'd5aad0d248c237360cf39c054b654d69',
 	'2c4a910a1299cdae2a4e55988a2f102e',
 	'846e27a652a5e1bfbd0ddd38a16dc865',
-	'72c887ead9a9d4ee114815748da3da35'
 	'baa3d3488db90289eb2889c1a2acbcde',
 	'e18a6a21eb44e77ca8d739a72209c370',
 	'3e329a4c9030b26ba152fb602a1d5893',
