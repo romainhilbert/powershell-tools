@@ -18,12 +18,13 @@
   Creation Date:  2021-01-02
 
 .EXAMPLE
+  SearchBy-Hash  -HashValue 9bb6826905965c13be1c84cc0ff83f42 	
   SearchBy-Hash  -SearchPath  "C:\temp"  -SearchFilter "*.exe"  -HashFile IOC_List.txt
-  SearchBy-Hash  -SearchPath  "C:\temp"  -SearchFilter "*.exe"  -HashValue 9bb6826905965c13be1c84cc0ff83f42  -Algorithm MD5  -HashFile IOC_List.txt
+  SearchBy-Hash  -SearchPath  "C:\temp"  -SearchFilter "*.exe"  -HashValue 9bb6826905965c13be1c84cc0ff83f42  -HashFile IOC_List.txt
   SearchBy-Hash  -SearchPath  "C:\temp"  -SearchFilter "*.exe"  -HashValue F3AABA4720B37439020298E180ED8DF02BC9FC88  -Algorithm SHA1  
-  SearchBy-Hash  -SearchPath  "C:\temp"  -SearchFilter "*.exe"  -HashValue CFA4F56807405FD36E406688FEB970A0D0D4854456BA2DA72E4A33A27B01D9AE  -Algorithm SHA256  
+  SearchBy-Hash  -SearchPath  "C:\temp"  -HashValue CFA4F56807405FD36E406688FEB970A0D0D4854456BA2DA72E4A33A27B01D9AE  -Algorithm SHA256  
   
-  IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/romainhilbert/powershell-tools/master/check-SearchBy-Hash.ps1')
+  IEX (New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/romainhilbert/powershell-tools/master/SearchBy-Hash.ps1')
 
 .NOTES
   https://us-cert.cisa.gov/ncas/alerts/aa20-352a
